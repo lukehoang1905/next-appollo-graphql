@@ -1,18 +1,15 @@
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { useEffect, useState } from "react";
+import client from "./api/appolloClient";
+import { gql } from "@apollo/client";
 
 const useFetchCSR = (limit) => {
   const [data, setData] = useState(null);
   const [isLoading, setLoading] = useState(false);
   useEffect(() => {
     setLoading(true);
-    const client = new ApolloClient({
-      uri: "https://api.spacex.land/graphql/",
-      cache: new InMemoryCache(),
-    });
     const query = async () => {
       const { data } = await client.query({
         query: gql`
@@ -103,10 +100,6 @@ export default function Home({ launches }) {
 }
 
 export async function getStaticProps() {
-  const client = new ApolloClient({
-    uri: "https://api.spacex.land/graphql/",
-    cache: new InMemoryCache(),
-  });
   const { data } = await client.query({
     query: gql`
       query GetLaunches {
