@@ -26,7 +26,7 @@ export default function Home({ launches }) {
           {launches.map((launch) => (
             <a
               key={launch.id}
-              href="https://nextjs.org/learn"
+              href={launch.links.video_link}
               className={styles.card}
             >
               <h2>{launch.mission_name} &rarr;</h2>
