@@ -4,39 +4,41 @@ import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
 import client from "./api/appolloClient";
 import { gql } from "@apollo/client";
+import Link from "next/link";
+
+const query = async (setData, setLoading, limit) => {
+  const { data } = await client.query({
+    query: gql`
+      query GetLaunches {
+        launchesPast(limit: ${limit}) {
+          id
+          mission_name
+          launch_date_local
+          launch_site {
+            site_name_long
+          }
+          links {
+            article_link
+            video_link
+            mission_patch
+          }
+          rocket {
+            rocket_name
+          }
+        }
+      }
+    `,
+  });
+  setData(data);
+  setLoading(false);
+};
 
 const useFetchCSR = (limit) => {
   const [data, setData] = useState(null);
   const [isLoading, setLoading] = useState(false);
   useEffect(() => {
     setLoading(true);
-    const query = async () => {
-      const { data } = await client.query({
-        query: gql`
-          query GetLaunches {
-            launchesPast(limit: ${limit}) {
-              id
-              mission_name
-              launch_date_local
-              launch_site {
-                site_name_long
-              }
-              links {
-                article_link
-                video_link
-                mission_patch
-              }
-              rocket {
-                rocket_name
-              }
-            }
-          }
-        `,
-      });
-      setData(data);
-      setLoading(false);
-    };
-    query();
+    query(setData, setLoading, limit);
   }, [limit]);
 
   return [data, isLoading];
@@ -50,6 +52,7 @@ export default function Home({ launches }) {
   const handleLimit = () => {
     setLimit((limit) => limit + 1);
   };
+
   return (
     <div className={styles.container}>
       {isLoading ? <h1>LOADING ...</h1> : <h1>{data?.launchesPast.length}</h1>}
@@ -72,12 +75,10 @@ export default function Home({ launches }) {
 
         <div className={styles.grid}>
           {launches.map((launch) => (
-            <a
-              key={launch.id}
-              href={launch.links.video_link}
-              className={styles.card}
-            >
-              <h2>{launch.mission_name} &rarr;</h2>
+            <a key={launch.id} href={launch.id} className={styles.card}>
+              <Link href={launch.id}>
+                <h2>{launch.mission_name} &rarr;</h2>
+              </Link>
             </a>
           ))}
         </div>
